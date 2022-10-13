@@ -239,7 +239,7 @@ if __name__ == "__main__":
     Scores = Starclf.oob_decision_function_[:,-1]
     #    
     #U statistics
-    U = mww(Scores[Y==grid_rf.classes_[0]],Scores[Y==grid_rf.classes_[1]])
+    U = mww(Scores[Y==grid_rf.classes_[0]],Scores[Y==grid_rf.classes_[1]],alternative='less')
     #Result 1 - p value estimations
     pvalue = U.pvalue
     #    
