@@ -244,7 +244,7 @@ if __name__ == "__main__":
     pvalue = U.pvalue
     #    
     #Result 2 - Predictor Importance
-    importance = InterpretImportance1(X,Y,grid_rf.best_params_,20,0)
+    importance = InterpretImportance1(X,Y,grid_rf.best_params_,50,0)
     #importance = Starclf.feature_importances_
     #    
     #    
