@@ -279,7 +279,7 @@ if __name__ == "__main__":
         et.write(str(elapsedTime))
     with open('pvalue.txt', 'w') as pv:
         pv.write(str(pvalue))
-    with open('importance.txt', 'w') as imp:
-        imp.write(str(importance))
+    #with open('importance.txt', 'w') as imp:
+    #    imp.write(str(importance))
     
     
