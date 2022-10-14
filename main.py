@@ -201,7 +201,7 @@ if __name__ == "__main__":
     maxMinLS = X.shape[0]
     maxnumPTS = X.shape[1]
     #    
-    min_samples_leaf  =  np.arange(1,int(np.round(0.5*maxMinLS)+1))
+    min_samples_leaf  =  np.arange(1,int(np.round(0.3*maxMinLS)+1))
     max_features =  np.arange(1,int(np.round(0.7*maxnumPTS)+1))
     #    
     params = dict(min_samples_leaf=min_samples_leaf,max_features=max_features)
