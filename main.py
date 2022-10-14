@@ -240,7 +240,7 @@ if __name__ == "__main__":
     Scores = Starclf.oob_decision_function_[:,-1]
     #    
     #U statistics
-    U = mww(Scores[Y==grid_rf.classes_[0]],Scores[Y==grid_rf.classes_[1]],alternative='less')
+    U = mww(Scores[Y==Starclf.classes_[0]],Scores[Y==Starclf.classes_[1]],alternative='less')
     #Result 1 - p value estimations
     pvalue = U.pvalue
     #    
@@ -248,6 +248,13 @@ if __name__ == "__main__":
     final_importance = InterpretImportance1(X,Y,grid_rf.best_params_,50,0)
     starmodel_importance = Starclf.feature_importances_
     #
+    #Result 3 - Size Effect
+    CohenD = (np.nanmean(Scores[Y==Starclf.classes_[1]]) - np.nanmean(Scores[Y==Starclf.classes_[0]]))/np.nanstd(Scores);
+    N1 = len(Scores[Y==Starclf.classes_[1]])
+    N0 = len(Scores[Y==Starclf.classes_[0]])
+    N = N1+N0
+    Biserial = Cohentemp*(np.sqrt(N1*N0/(N*(N-1))))#Diana Kornbrot 2014
+    size_effect = np.append(Cohentemp,Biserialtemp)
     #Figure of sorted Importance
     #Imp_ind = (-final_importance).argsort()
     x_pos = np.arange(len(final_importance))
@@ -276,7 +283,7 @@ if __name__ == "__main__":
         et.write(str(elapsedTime))
     with open('pvalue.txt', 'w') as pv:
         pv.write(str(pvalue))
-    #with open('importance.txt', 'w') as imp:
-    #    imp.write(str(importance))
+    with open('size_effect.txt', 'w') as se:
+        se.write(str(size_effect))
     
     
