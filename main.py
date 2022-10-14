@@ -256,6 +256,7 @@ if __name__ == "__main__":
     Variable_names = df.columns[0:-1]
     Variable_names = Variable_names[Imp_ind] 
     plt.xticks(x_pos, tuple(Variable_names),rotation=90)
+    plt.show()
     #    
     #    
     ######################################################################
