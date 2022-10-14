@@ -249,19 +249,16 @@ if __name__ == "__main__":
     starmodel_importance = Starclf.feature_importances_
     #
     #Figure of sorted Importance
-    Imp_ind = (-final_importance).argsort()
+    #Imp_ind = (-final_importance).argsort()
     x_pos = np.arange(len(final_importance))
-    plt.bar(x_pos, final_importance[Imp_ind])
+    plt.bar(x_pos, final_importance)
     Variable_names = df.columns[0:-1]
-    Variable_names = Variable_names[Imp_ind] 
+    Variable_names = Variable_names 
     plt.xticks(x_pos, tuple(Variable_names),rotation=90)
     plt.savefig("final_importance.png")
     
-    Imp_ind = (-starmodel_importance).argsort()
-    x_pos = np.arange(len(starmodel_importance))
-    plt.bar(x_pos, starmodel_importance[Imp_ind])
-    Variable_names = df.columns[0:-1]
-    Variable_names = Variable_names[Imp_ind] 
+    #Imp_ind = (-starmodel_importance).argsort()
+    plt.bar(x_pos, starmodel_importance)
     plt.xticks(x_pos, tuple(Variable_names),rotation=90)
     plt.savefig("starmodel_importance.png")
     
