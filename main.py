@@ -272,8 +272,6 @@ if __name__ == "__main__":
         pv.write(str(pvalue))
     with open('importance.txt', 'w') as imp:
         imp.write(str(importance))
-    with open('output_importance.png', 'w') as oi:
-        oi.write(str(importance))
     plt.savefig("output_importance.png")
     
     
