@@ -245,7 +245,16 @@ if __name__ == "__main__":
     #    
     #Result 2 - Predictor Importance
     importance = InterpretImportance1(X,Y,grid_rf.best_params_,50,0)
+    #
     #importance = Starclf.feature_importances_
+    #
+    #Figure of sorted Importance
+    Imp_ind = (-importance).argsort()
+    x_pos = np.arange(len(importance))
+    plt.bar(x_pos, importance[Imp_ind])
+    Variable_names = df.columns[0:-1]
+    Variable_names = Variable_names[Imp_ind] 
+    plt.xticks(x_pos, tuple(Variable_names),rotation=90)
     #    
     #    
     ######################################################################
@@ -262,5 +271,6 @@ if __name__ == "__main__":
         pv.write(str(pvalue))
     with open('importance.txt', 'w') as imp:
         imp.write(str(importance))
+    plt.savefig("output_importance.jpg")
     
     
