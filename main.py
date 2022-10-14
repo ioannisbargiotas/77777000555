@@ -253,8 +253,8 @@ if __name__ == "__main__":
     N1 = len(Scores[Y==Starclf.classes_[1]])
     N0 = len(Scores[Y==Starclf.classes_[0]])
     N = N1+N0
-    Biserial = Cohentemp*(np.sqrt(N1*N0/(N*(N-1))))#Diana Kornbrot 2014
-    size_effect = np.append(Cohentemp,Biserialtemp)
+    Biserial = CohenD*(np.sqrt(N1*N0/(N*(N-1))))#Diana Kornbrot 2014
+    size_effect = np.append(CohenD,Biserial)
     #Figure of sorted Importance
     #Imp_ind = (-final_importance).argsort()
     x_pos = np.arange(len(final_importance))
