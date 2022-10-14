@@ -256,7 +256,6 @@ if __name__ == "__main__":
     Variable_names = df.columns[0:-1]
     Variable_names = Variable_names[Imp_ind] 
     plt.xticks(x_pos, tuple(Variable_names),rotation=90)
-    plt.show()
     #    
     #    
     ######################################################################
@@ -273,6 +272,8 @@ if __name__ == "__main__":
         pv.write(str(pvalue))
     with open('importance.txt', 'w') as imp:
         imp.write(str(importance))
+    with open('output_importance.png', 'w') as oi:
+        oi.write(str(importance))
     plt.savefig("output_importance.png")
     
     
