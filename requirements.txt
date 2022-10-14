@@ -6,4 +6,4 @@ pandas==1.4.2
 sklearn==0.0
 statsmodels==0.12.1
 openpyxl==3.0.9
-joblib==1.1.0
+joblib==1.2.0
