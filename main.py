@@ -68,7 +68,7 @@ def InterpretImportance1(X,Y,params,iters,model):
     
     #Run multiple times and keep Importance
     importance = np.zeros([iters,X.shape[1]]) 
-    clf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
+    clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
     
     
     importance = Parallel(n_jobs=-1)(delayed(InitImport)(clf,X,Y,i) for i in np.arange(0,iters))
@@ -110,9 +110,9 @@ def InterpretImportance1(X,Y,params,iters,model):
     for j in np.arange(0,PassedVariables.size):
         Xtemp = X[:,DescendAvImpIndex[0:j+1]]
         if Xtemp.shape[1]<params['max_features']:
-            clf = RandomForestClassifier(n_estimators = Ntrees,max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
+            clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
         else:
-            clf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)    
+            clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)    
         
         imptemp = np.zeros([iters,Xtemp.shape[1]])
         AUC = np.zeros(iters)
@@ -200,11 +200,24 @@ if __name__ == "__main__":
     #Set Parameters' and ranges to be otimized
     maxMinLS = X.shape[0]
     maxnumPTS = X.shape[1]
+    #
+    # Number of features to consider at every split
+    max_features = [int(x) for x in np.linspace(1,np.ceil(np.sqrt(maxnumPTS)),num = 5)]
+    # Maximum number of levels in tree
+    max_depth = np.arange(3,8,2)
+    # Minimum number of samples required to split a node
+    min_samples_split = np.linspace(0.1, 0.4, num = 4)
+    # Minimum number of samples required at each leaf node
+    min_samples_leaf = [int(x) for x in np.linspace(1, int(np.round(0.2*maxMinLS)+1), num = 8)]
+    # Create the random grid
+    random_grid = {'max_features': max_features,
+                   'max_depth': max_depth,
+                   'min_samples_split': min_samples_split,
+                   'min_samples_leaf': min_samples_leaf}
+    #min_samples_leaf  =  np.arange(1,int(np.round(0.2*maxMinLS)+1))
+    #max_features =  np.arange(1,int(np.round(0.7*maxnumPTS)+1))
     #    
-    min_samples_leaf  =  np.arange(1,int(np.round(0.2*maxMinLS)+1))
-    max_features =  np.arange(1,int(np.round(0.7*maxnumPTS)+1))
-    #    
-    params = dict(min_samples_leaf=min_samples_leaf,max_features=max_features)
+    #params = dict(min_samples_leaf=min_samples_leaf,max_features=max_features)
     #    
     #    
     #Random Forest Classifier and Random or Grid Optimization
@@ -214,7 +227,7 @@ if __name__ == "__main__":
     #
     cv = [(slice(None), slice(None))]
     clf = RandomForestClassifier(n_estimators = Ntrees,oob_score=True)
-    grid_rf = GridSearchCV(estimator=clf, param_grid = params, scoring = OOBAUC, cv = cv, n_jobs=-1,verbose = 1)
+    grid_rf = GridSearchCV(estimator=clf, param_grid = random_grid, scoring = OOBAUC, cv = cv, n_jobs=-1,verbose = 1)
     #clf = RandomForestClassifier(n_estimators = Ntrees ,oob_score=True)
     #grid_rf = GridSearchCV(clf, param_grid = params, scoring = 'roc_auc', cv = 5, n_jobs=-1,verbose = 1)
     #grid_rf = RandomizedSearchCV(clf, params,scoring = 'roc_auc', cv = 5, n_jobs=8,verbose = 1, n_iter = 50)
@@ -228,7 +241,7 @@ if __name__ == "__main__":
     #report(grid_rf.cv_results_)
     #    
     params = grid_rf.best_params_
-    Starclf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
+    Starclf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
     Starclf.fit(X, Y)
     #Starclf = grid_rf.best_estimator_
     #    
@@ -245,7 +258,7 @@ if __name__ == "__main__":
     pvalue = U.pvalue
     #    
     #Result 2 - Predictor Importance
-    final_importance = InterpretImportance1(X,Y,grid_rf.best_params_,50,0)
+    final_importance = InterpretImportance1(X,Y,params,50,0)
     starmodel_importance = Starclf.feature_importances_
     #
     #Result 3 - Size Effect
