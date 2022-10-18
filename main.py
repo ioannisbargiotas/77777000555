@@ -204,7 +204,7 @@ if __name__ == "__main__":
     maxnumPTS = X.shape[1]
     #
     # Number of features to consider at every split
-    max_features = [int(x) for x in np.linspace(1,np.ceil(np.round(0.7*maxnumPTS)),num = 5)]
+    max_features = [int(x) for x in np.linspace(1,np.ceil(np.round(0.7*maxnumPTS)),num = 10)]
     # Maximum number of levels in tree
     max_depth = np.arange(3,8,2)
     # Minimum number of samples required to split a node
