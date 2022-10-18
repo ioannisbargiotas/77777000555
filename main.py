@@ -68,8 +68,8 @@ def InterpretImportance1(X,Y,params,iters,model):
     
     #Run multiple times and keep Importance
     importance = np.zeros([iters,X.shape[1]]) 
-    clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
-    #clf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
+    #clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
+    clf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
     
     
     importance = Parallel(n_jobs=-1)(delayed(InitImport)(clf,X,Y,i) for i in np.arange(0,iters))
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     #min_samples_leaf  =  np.arange(1,int(np.round(0.2*maxMinLS)+1))
     #max_features =  np.arange(1,int(np.round(0.7*maxnumPTS)+1))
     #    
-    random_grid = dict(min_samples_leaf=min_samples_leaf,max_features=max_features)
+    #random_grid = dict(min_samples_leaf=min_samples_leaf,max_features=max_features)
     #    
     #    
     #Random Forest Classifier and Random or Grid Optimization
