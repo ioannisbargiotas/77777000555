@@ -18,7 +18,8 @@ from sklearn.ensemble import RandomForestRegressor
 import multiprocessing as mp
 from joblib import Parallel, delayed
 
-    
+
+#OOBAUC calculates the AUC from the OOBscores and use it as maximization criterion
 def OOBAUC(estimator,X,y):
     PositiveOOBPosterior = np.zeros([y.shape[0],BOiterations])*np.nan 
     for j in np.arange(0,BOiterations):
@@ -47,11 +48,13 @@ def OOBAUC(estimator,X,y):
 # Function of Predictor Importance (see Genuer et al 2010, Bargiotas et al 2020, Bargiotas et al 2021)
 def InterpretImportance1(X,Y,params,iters,model):
     
+#Local Function (for parallel processing) to calculate initial importance tendencies from OOB importance    
     def InitImport(clf,X,Y,i):
         clf.fit(X, Y)
         importance = clf.feature_importances_
         return importance
     
+#Local Function (for parallel processing) to calculate oob decision, importance and  AUC   
     def SecondImport(clf,X,Y,j):
         clf.fit(X,Y)
         oobPred = clf.oob_decision_function_[:,-1]
@@ -66,43 +69,40 @@ def InterpretImportance1(X,Y,params,iters,model):
         return imptemp, AUC;
     
     
-    #Run multiple times and keep Importance
+#Run multiple times and keep Importance
     importance = np.zeros([iters,X.shape[1]]) 
     #clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
     clf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
     
-    
+#Run InitImport in parallel
     importance = Parallel(n_jobs=-1)(delayed(InitImport)(clf,X,Y,i) for i in np.arange(0,iters))
-    # with parallel_backend(backend="multiprocessing", n_jobs=-1):
-        # importance = Parallel((delayed(InitImport)(clf,X,Y,i) for i in np.arange(0,iters)))
-    #importance = pool.starmap(InitImport, [(clf,X,Y,i) for i in np.arange(0,iters)])
-    # for i in np.arange(0,iters):
-    #     clf.fit(X, Y)
-    #     importance[i,:] = clf.feature_importances_
+
     AvImp = np.mean(importance, axis = 0)
     StdImp = np.std(importance, axis = 0)
     
     
     
-    #Definition of Threshold (Check Genuer 2010)    
+#Definition of Threshold (Check Genuer 2010)    
     DescendAvImpIndex =  (-AvImp).argsort()
     DescendAvImpValue =  AvImp[DescendAvImpIndex]
     
     AscendStdImpIndex = StdImp.argsort()
     AscendStdImpValue = StdImp[AscendStdImpIndex]
     
+ #Create a linear regression with Sorted STDs 
     rgf = RandomForestRegressor(n_estimators = Ntrees,oob_score=True)
     rgf.fit(np.arange(0,AscendStdImpValue.size).reshape(-1, 1), AscendStdImpValue.reshape(-1, 1).ravel())
+    
     oobThres = rgf.oob_prediction_
     Threshold = oobThres.min()
     
     
-    #Keep the variables that passes the Threshold
+ #Keep the dimensions that passes the significance Threshold
     PassedVariables = DescendAvImpIndex[DescendAvImpValue>Threshold]
     
     
     
-    #Keep model depending on its mean and std of AUC 
+ #Keep model depending on its mean and std of AUC 
     jsize = PassedVariables.size
     MeanAUC = np.zeros(jsize)
     StdAUC = np.zeros(jsize)
@@ -110,10 +110,10 @@ def InterpretImportance1(X,Y,params,iters,model):
     
     for j in np.arange(0,PassedVariables.size):
         Xtemp = X[:,DescendAvImpIndex[0:j+1]]
-        if Xtemp.shape[1]<params['max_features']:
-            clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
+        #if Xtemp.shape[1]<params['max_features']:
+            #clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
             #clf = RandomForestClassifier(n_estimators = Ntrees,max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
-        else:
+        #else:
             clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)    
             #clf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)    
         imptemp = np.zeros([iters,Xtemp.shape[1]])
