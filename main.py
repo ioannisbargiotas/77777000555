@@ -260,6 +260,6 @@ if __name__ == "__main__":
     with open('size_effect.txt', 'w') as se:
         se.write(str(size_effect))
     with open('params.txt', 'w') as hp:
-        et.write(str(params))    
+        hp.write(str(params))    
     
     
