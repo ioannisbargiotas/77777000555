@@ -44,7 +44,7 @@ def OOBAUC(estimator,X,y):
         #AUC[j] = (W1-n1*(n1+1)/2)/(n1*n2)
     
     "Error to be maximized"
-    Final_error = np.mean(AUC) - np.std(AUC)
+    Final_error = np.mean(AUC)# - np.std(AUC)
     
     #"Calculate AUC"
     #PositiveOOB = PositiveOOBPosterior.mean(axis=1)
@@ -211,6 +211,7 @@ if __name__ == "__main__":
     U = mww(Scores[Y==Starclf.classes_[0]],Scores[Y==Starclf.classes_[1]],alternative='less')
     #Result 1 - p value estimations
     pvalue = U.pvalue
+    pvalue = np.append(pvalue,grid_rf.best_score_)
     #    
     #Result 2 - Predictor Importance
     final_importance = InterpretImportance1(X,Y,params,50,0)
