@@ -212,12 +212,16 @@ if __name__ == "__main__":
     s1 = np.nanstd(Scores1)
     s = np.sqrt(((N0 - 1)*s0**2 + (N1 - 1)*s1**2)/(N - 2))
     CohenD = (np.nanmean(Scores1) - np.nanmean(Scores0))/s;
-
-    
-    Biserial = CohenD*(np.sqrt(N1*N0/(N*(N-1))))#Diana Kornbrot 2014
-    size_effect = np.append(CohenD,Biserial)
-    #Figure of sorted Importance
-    #Imp_ind = (-final_importance).argsort()
+    # Biserial Size effect
+    Biserial = np.sqrt(CohenD**2*N1*N0/(N*(N-2)+CohenD**2*N1*N0))#Diana Kornbrot 2014, eq.3
+    rho = np.corrcoef(Scores, Y)
+    Pearson = rho[0,1] 
+    size_effect = np.append(CohenD,Biserial,Pearson)
+    #    
+    # Exports
+    ######################################################################
+    #  
+    #Figure of Importance
     x_pos = np.arange(len(final_importance))
     plt.bar(x_pos, final_importance)
     Variable_names = df.columns[0:-1]
@@ -230,13 +234,7 @@ if __name__ == "__main__":
     plt.xticks(x_pos, tuple(Variable_names),rotation=90)
     plt.savefig("starmodel_importance.png") 
     #    
-    #    
-    ######################################################################
-    #    
-    #OPTIONAL : More accurate predictor importance but very heavy coding
-    #iterations = 20
-    #importance = InterpretImportance1(X,Y,grid_rf.best_params_,iterations)
-    # print(time() - start)
+   
     end = time()
     elapsedTime = end-start
     with open('elapsedTime.txt', 'w') as et:
