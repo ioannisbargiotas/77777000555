@@ -34,14 +34,14 @@ def OOBAUC(estimator,X,y):
         
         "Calculate AUC"
         PositiveOOB = OOBPosterior[:,-1]#PositiveOOBPosterior.mean(axis=1)
-        fpr, tpr, thresholds = metrics.roc_curve(y, PositiveOOB, pos_label=1)
-        AUC[j] = metrics.auc(fpr, tpr)
-        #n1 = np.count_nonzero(y==clf.classes_[-1])
-        #n2 = y.size - n1;
-        #TiedRank = rankdata(PositiveOOB)
-        #W1 = np.sum(TiedRank[y == clf.classes_[-1]])
-        #"W2 = np.sum(TiedRank[Y == clf.classes_[0]])"
-        #AUC[j] = (W1-n1*(n1+1)/2)/(n1*n2)
+        #fpr, tpr, thresholds = metrics.roc_curve(y, PositiveOOB, pos_label=1)
+        #AUC[j] = metrics.auc(fpr, tpr)
+        n1 = np.count_nonzero(y==clf.classes_[-1])
+        n2 = y.size - n1;
+        TiedRank = rankdata(PositiveOOB)
+        W1 = np.sum(TiedRank[y == clf.classes_[-1]])
+        "W2 = np.sum(TiedRank[Y == clf.classes_[0]])"
+        AUC[j] = (W1-n1*(n1+1)/2)/(n1*n2)
     
     "Error to be maximized"
     Final_error = np.mean(AUC)# - np.std(AUC)
