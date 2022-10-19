@@ -216,7 +216,8 @@ if __name__ == "__main__":
     Biserial = np.sqrt(CohenD**2*N1*N0/(N*(N-2)+CohenD**2*N1*N0))#Diana Kornbrot 2014, eq.3
     rho = np.corrcoef(Scores, Y)
     Pearson = rho[0,1] 
-    size_effect = np.append(CohenD,Biserial,Pearson)
+    size_effect = np.append(CohenD,Biserial)
+    size_effect = np.append(size_effect,Pearson)
     #    
     # Exports
     ######################################################################
