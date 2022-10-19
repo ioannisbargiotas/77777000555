@@ -210,7 +210,7 @@ if __name__ == "__main__":
     Scores1 = Scores[Y==Starclf.classes_[1]]
     s0 = np.nanstd(Scores0)
     s1 = np.nanstd(Scores1)
-    s = sqrt(((N0 - 1) . s0^2 + (N1 - 1) . s1^2) / (N - 2))
+    s = np.sqrt(((N0 - 1) . s0^2 + (N1 - 1) . s1^2) / (N - 2))
     CohenD = (np.nanmean(Scores1) - np.nanmean(Scores0))/s;
 
     
