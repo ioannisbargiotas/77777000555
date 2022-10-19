@@ -166,7 +166,7 @@ if __name__ == "__main__":
     # Minimum number of samples required to split a node
     min_samples_split = np.linspace(0.1, 0.4, num = 4)
     # Minimum number of samples required at each leaf node
-    min_samples_leaf = [int(x) for x in np.linspace(1, int(np.round(0.2*maxMinLS)+1), num = 10)]
+    min_samples_leaf = [int(x) for x in np.linspace(1, int(np.round(0.2*maxMinLS)+1), num = 20)]
     # Create the random grid
     random_grid = {'max_features': max_features,
                    'max_depth': max_depth,
