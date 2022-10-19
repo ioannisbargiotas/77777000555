@@ -162,9 +162,9 @@ if __name__ == "__main__":
     # Number of features to consider at every split
     max_features = [int(x) for x in np.linspace(1,np.ceil(np.round(0.7*maxnumPTS)),num = 20)]
     # Maximum number of levels in tree
-    max_depth = np.arange(3,8,2)
+    max_depth = np.arange(5,8,2)
     # Minimum number of samples required to split a node
-    min_samples_split = np.linspace(0.1, 0.3, num = 3)
+    min_samples_split = np.linspace(0.1, 0.2, num = 2)
     # Minimum number of samples required at each leaf node
     min_samples_leaf = [int(x) for x in np.linspace(1, int(np.round(0.2*maxMinLS)+1), num = 20)]
     # Create the random grid
