@@ -17,6 +17,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 import multiprocessing as mp
 from joblib import Parallel, delayed
+from sklearn import metrics
 
 
 #OOBAUC calculates the AUC from the OOBscores and use it as maximization criterion
