@@ -214,10 +214,10 @@ if __name__ == "__main__":
     CohenD = (np.nanmean(Scores1) - np.nanmean(Scores0))/s;
     # Biserial Size effect
     Biserial = np.sqrt(CohenD**2*N1*N0/(N*(N-2)+CohenD**2*N1*N0))#Diana Kornbrot 2014, eq.3
-    rho = np.corrcoef(Scores, Y)
-    Pearson = rho[0,1] 
     size_effect = np.append(CohenD,Biserial)
-    size_effect = np.append(size_effect,Pearson)
+    #rho = np.corrcoef(Scores, Y)
+    #Pearson = rho[0,1] 
+    #size_effect = np.append(size_effect,Pearson)
     #    
     # Exports
     ######################################################################
@@ -235,7 +235,6 @@ if __name__ == "__main__":
     plt.xticks(x_pos, tuple(Variable_names),rotation=90)
     plt.savefig("starmodel_importance.png") 
     #    
-   
     end = time()
     elapsedTime = end-start
     with open('elapsedTime.txt', 'w') as et:
