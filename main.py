@@ -48,13 +48,13 @@ def OOBAUC(estimator,X,y):
 # Function of Predictor Importance (see Genuer et al 2010, Bargiotas et al 2020, Bargiotas et al 2021)
 def InterpretImportance1(X,Y,params,iters,complexity):
     
-#Local Function (for parallel processing) to calculate initial importance tendencies from OOB importance    
+    #Local Function (for parallel processing) to calculate initial importance tendencies from OOB importance    
     def InitImport(clf,X,Y,i):
         clf.fit(X, Y)
         importance = clf.feature_importances_
         return importance
     
-#Local Function (for parallel processing) to calculate oob decision, importance and  AUC   
+    #Local Function (for parallel processing) to calculate oob decision, importance and  AUC   
     def SecondImport(clf,X,Y,j):
         clf.fit(X,Y)
         oobPred = clf.oob_decision_function_[:,-1]
@@ -69,40 +69,33 @@ def InterpretImportance1(X,Y,params,iters,complexity):
         return imptemp, AUC;
     
     
-#Run multiple times and keep Importance
+    #Run multiple times and keep Importance
     importance = np.zeros([iters,X.shape[1]]) 
     #clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
     clf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
-    
-#Run InitImport in parallel
+    #
+    #Run InitImport in parallel
     importance = Parallel(n_jobs=-1)(delayed(InitImport)(clf,X,Y,i) for i in np.arange(0,iters))
-
     AvImp = np.mean(importance, axis = 0)
     StdImp = np.std(importance, axis = 0)
-    
-    
-    
-#Definition of Threshold (Check Genuer 2010)    
+    #
+    #Definition of Threshold (Check Genuer 2010)    
     DescendAvImpIndex =  (-AvImp).argsort()
     DescendAvImpValue =  AvImp[DescendAvImpIndex]
-    
     AscendStdImpIndex = StdImp.argsort()
     AscendStdImpValue = StdImp[AscendStdImpIndex]
     
- #Create a linear regression with Sorted STDs 
+    #Create a linear regression with Sorted STDs (Check Genuer 2010) 
     rgf = RandomForestRegressor(n_estimators = Ntrees,oob_score=True)
     rgf.fit(np.arange(0,AscendStdImpValue.size).reshape(-1, 1), AscendStdImpValue.reshape(-1, 1).ravel())
     
     oobThres = rgf.oob_prediction_
     Threshold = oobThres.min()
-    
-    
- #Keep the dimensions that passes the significance Threshold
+    #  
+    #Keep the dimensions that passes the significance Threshold
     PassedVariables = DescendAvImpIndex[DescendAvImpValue>Threshold]
-    
-    
-    
- #Keep model depending on its mean and std of AUC 
+    #
+    #Keep model depending on its mean and std of AUC 
     jsize = PassedVariables.size
     MeanAUC = np.zeros(jsize)
     StdAUC = np.zeros(jsize)
@@ -129,66 +122,40 @@ def InterpretImportance1(X,Y,params,iters,complexity):
         MeanAUC[j] = AUC.mean()
         StdAUC[j] = AUC.std()
         ImportanceCell[j,DescendAvImpIndex[0:j+1]] =  imptemp.mean(axis = 0)
-    
+    #
     #Find the most parsimonious model which is higher than MaxAUC - StdAUC[ArgMaxAUC]
     ArgMaxAUC = MeanAUC.argmax()
     MaxAUC = MeanAUC.max()
     ThresAUC = MaxAUC - StdAUC[ArgMaxAUC] 
     ImpOfPossibleNestedModels = ImportanceCell[MeanAUC>ThresAUC,:]
-    
+    #
     #from the selected complexity model (usually the most parsimonious in position 0) 
     FinalImportance = ImpOfPossibleNestedModels[complexity,:]
     return FinalImportance    
 
-
-#Utility function to report best scores
-def report(results, n_top=3):
-    for i in range(1, n_top + 1):
-        candidates = np.flatnonzero(results['rank_test_score'] == i)
-        for candidate in candidates:
-            print("Model with rank: {0}".format(i))
-            print("Mean validation score: {0:.3f} (std: {1:.3f})"
-                  .format(results['mean_test_score'][candidate],
-                          results['std_test_score'][candidate]))
-            print("Parameters: {0}".format(results['params'][candidate]))
-            print("")
-
-
-#MAIN CODE
-
+# MAIN CODE
 
 if __name__ == "__main__":
-    #mp.freeze_support()
-    #Import data
     start = time()
-    
+    #Inputs from demo
     args = argparse.ArgumentParser()
-    #args.add_argument('input', metavar='input', nargs='+',help='path of the input')    
     args.add_argument('Ntrees', metavar='Ntrees', type=int, nargs='+',help='n of trees')
     args.add_argument('BOiterations', metavar='BOiterations', type=int, nargs='+',help='Iteration of Optimization')
-    
-    #
-    #    
-    #    
+    #  
     error_message = ""
     #    
     parsed_args = args.parse_args() 
-    #file_address = parsed_args.input[0]
     Ntrees = parsed_args.Ntrees[0]
     BOiterations = parsed_args.BOiterations[0]
-    path = 'C:\\Users\\ibargiotas\\Documents\\MATLAB\\Two-sample AUC maximization\\Parkinsons\\'
-    #df = pd.read_excel(path+'OpenEyes.xlsx')
-    #df = pd.read_excel(file_address)
     df = pd.read_excel('input_0.xlsx')    
-    #    	 
-    #    
+    #    	   
     #Labels in the Last column 
     Features = np.array(df)
     X = Features[:,:-1]
     Y = Features[:,-1]
     #    
     #    
-    #Set Parameters' and ranges to be otimized
+    #Set Parameters' and ranges to be optimized
     maxMinLS = X.shape[0]
     maxnumPTS = X.shape[1]
     #
@@ -205,46 +172,26 @@ if __name__ == "__main__":
                    'max_depth': max_depth,
                    'min_samples_split': min_samples_split,
                    'min_samples_leaf': min_samples_leaf}
-    #min_samples_leaf  =  np.arange(1,int(np.round(0.2*maxMinLS)+1))
-    #max_features =  np.arange(1,int(np.round(0.7*maxnumPTS)+1))
-    #    
-    #random_grid = dict(min_samples_leaf=min_samples_leaf,max_features=max_features)
-    #    
-    #    
-    #Random Forest Classifier and Random or Grid Optimization
-    #Ntrees = 2*Y.size
-    #if Ntrees>50:
-    #    Ntrees=50
-    #
+    
+    #Grid search with 1fold as CV schema (reminder:we use the OOB decision score for Validation) (see Silke Janitza and Roman Hornung 2018)
     cv = [(slice(None), slice(None))]
     clf = RandomForestClassifier(n_estimators = Ntrees,oob_score=True)
     grid_rf = GridSearchCV(estimator=clf, param_grid = random_grid, scoring = OOBAUC, cv = cv, n_jobs=-1,verbose = 1)
-    #clf = RandomForestClassifier(n_estimators = Ntrees ,oob_score=True)
-    #grid_rf = GridSearchCV(clf, param_grid = params, scoring = 'roc_auc', cv = 5, n_jobs=-1,verbose = 1)
-    #grid_rf = RandomizedSearchCV(clf, params,scoring = 'roc_auc', cv = 5, n_jobs=8,verbose = 1, n_iter = 50)
-    #    
-    #Evaluation
     
+    #Evaluation
     grid_rf.fit(X, Y)
-
-    #print("GridSearchCV or RandomizedSearchCV took %.2f seconds for %d candidate parameter settings."
-    #      % (Timepvalue, len(grid_rf.cv_results_['params'])))
-    #report(grid_rf.cv_results_)
-    #    
+    
     params = grid_rf.best_params_
+    
+    #Creation of Star Model
     Starclf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
     #Starclf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
     Starclf.fit(X, Y)
-    #Starclf = grid_rf.best_estimator_
-    #    
-    #Manual greedy approach with OOB cross validation
-    #Starclf = GreedySearchAUCMaxOOB(min_samples_leaf,max_features)
-    #    
-    #    
-    #Take OOB
+    
+    #Take OOB probabilities of POSITIVE class 
     Scores = Starclf.oob_decision_function_[:,-1]
     #    
-    #U statistics
+    #U statistics - alternative = less because we took scores of POSITIVE class 
     U = mww(Scores[Y==Starclf.classes_[0]],Scores[Y==Starclf.classes_[1]],alternative='less')
     #Result 1 - p value estimations
     pvalue = U.pvalue
@@ -254,9 +201,15 @@ if __name__ == "__main__":
     starmodel_importance = Starclf.feature_importances_
     #
     #Result 3 - Size Effect
-    CohenD = (np.nanmean(Scores[Y==Starclf.classes_[1]]) - np.nanmean(Scores[Y==Starclf.classes_[0]]))/np.nanstd(Scores);
-    N1 = len(Scores[Y==Starclf.classes_[1]])
     N0 = len(Scores[Y==Starclf.classes_[0]])
+    N1 = len(Scores[Y==Starclf.classes_[1]])
+    
+    #Cohen's D
+    s0 = np.nanstd(Scores[Y==Starclf.classes_[0]]))
+    s1 = np.nanstd(Scores[Y==Starclf.classes_[1]]))
+    s = sqrt(((N0 - 1) . s0^2 + (N1 - 1) . s1^2) / (N0 + N1 - 2))
+    CohenD = (np.nanmean(Scores[Y==Starclf.classes_[1]]) - np.nanmean(Scores[Y==Starclf.classes_[0]]))/s;
+
     N = N1+N0
     Biserial = CohenD*(np.sqrt(N1*N0/(N*(N-1))))#Diana Kornbrot 2014
     size_effect = np.append(CohenD,Biserial)
@@ -272,8 +225,7 @@ if __name__ == "__main__":
     #Imp_ind = (-starmodel_importance).argsort()
     plt.bar(x_pos, starmodel_importance)
     plt.xticks(x_pos, tuple(Variable_names),rotation=90)
-    plt.savefig("starmodel_importance.png")
-    
+    plt.savefig("starmodel_importance.png") 
     #    
     #    
     ######################################################################
