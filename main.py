@@ -203,14 +203,17 @@ if __name__ == "__main__":
     #Result 3 - Size Effect
     N0 = len(Scores[Y==Starclf.classes_[0]])
     N1 = len(Scores[Y==Starclf.classes_[1]])
+    N = N1+N0
     
     #Cohen's D
-    s0 = np.nanstd(Scores[Y==Starclf.classes_[0]]))
-    s1 = np.nanstd(Scores[Y==Starclf.classes_[1]]))
-    s = sqrt(((N0 - 1) . s0^2 + (N1 - 1) . s1^2) / (N0 + N1 - 2))
-    CohenD = (np.nanmean(Scores[Y==Starclf.classes_[1]]) - np.nanmean(Scores[Y==Starclf.classes_[0]]))/s;
+    Scores0 = Scores[Y==Starclf.classes_[0]]
+    Scores1 = Scores[Y==Starclf.classes_[1]]
+    s0 = np.nanstd(Scores0)
+    s1 = np.nanstd(Scores1)
+    s = sqrt(((N0 - 1) . s0^2 + (N1 - 1) . s1^2) / (N - 2))
+    CohenD = (np.nanmean(Scores1) - np.nanmean(Scores0))/s;
 
-    N = N1+N0
+    
     Biserial = CohenD*(np.sqrt(N1*N0/(N*(N-1))))#Diana Kornbrot 2014
     size_effect = np.append(CohenD,Biserial)
     #Figure of sorted Importance
