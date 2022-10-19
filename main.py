@@ -46,7 +46,7 @@ def OOBAUC(estimator,X,y):
 
 
 # Function of Predictor Importance (see Genuer et al 2010, Bargiotas et al 2020, Bargiotas et al 2021)
-def InterpretImportance1(X,Y,params,iters,model):
+def InterpretImportance1(X,Y,params,iters,complexity):
     
 #Local Function (for parallel processing) to calculate initial importance tendencies from OOB importance    
     def InitImport(clf,X,Y,i):
@@ -110,31 +110,20 @@ def InterpretImportance1(X,Y,params,iters,model):
     
     for j in np.arange(0,PassedVariables.size):
         Xtemp = X[:,DescendAvImpIndex[0:j+1]]
-        #if Xtemp.shape[1]<params['max_features']:
-            #clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
+        
+        if Xtemp.shape[1]<params['max_features']:
+            clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
             #clf = RandomForestClassifier(n_estimators = Ntrees,max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
-        #else:
+        else:
             clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)    
             #clf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)    
+        
+        #For every meaningful combination, calculate AUC and importance
         imptemp = np.zeros([iters,Xtemp.shape[1]])
         AUC = np.zeros(iters)
-        
         res = Parallel(n_jobs=-1)(delayed(SecondImport)(clf,Xtemp,Y,i) for i in np.arange(0,iters))
         
-        # for jj in np.arange(0,iters):
-        #     clf.fit(Xtemp,Y)
-        #     oobPred = clf.oob_decision_function_[:,-1]
-            
-        #     #Calculate AUC
-        #     n1 = np.count_nonzero(Y==clf.classes_[-1])
-        #     n2 = Y.size - n1;
-        #     TiedRank = rankdata(oobPred)
-        #     W1 = np.sum(TiedRank[Y == clf.classes_[-1]])
-        #     AUC[jj] = (W1-n1*(n1+1)/2)/(n1*n2);
-        #     imptemp[jj,:] = clf.feature_importances_
-        
-        # AUC = np.array(res.AUC)
-        # imptemp = np.array(res.imptemp)
+        #Save Mean(AUC) std(AUC) and Mean Importance 
         imptemp = np.array([item[0] for item in res])
         AUC = np.array([item[1] for item in res])
         MeanAUC[j] = AUC.mean()
@@ -148,7 +137,7 @@ def InterpretImportance1(X,Y,params,iters,model):
     ImpOfPossibleNestedModels = ImportanceCell[MeanAUC>ThresAUC,:]
     
     #from the selected complexity model (usually the most parsimonious in position 0) 
-    FinalImportance = ImpOfPossibleNestedModels[model,:]
+    FinalImportance = ImpOfPossibleNestedModels[complexity,:]
     return FinalImportance    
 
 
