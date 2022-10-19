@@ -23,7 +23,7 @@ from sklearn import metrics
 #OOBAUC calculates the AUC from the OOBscores and use it as maximization criterion
 def OOBAUC(estimator,X,y):
     PositiveOOBPosterior = np.zeros([y.shape[0],BOiterations])*np.nan 
-    AUC = np.zeros([iterations])*np.nan
+    AUC = np.zeros([BOiterations])*np.nan
     for j in np.arange(0,BOiterations):
         "Create the forest"
         estimator.fit(X, y)
