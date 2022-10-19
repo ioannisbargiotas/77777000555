@@ -44,7 +44,7 @@ def OOBAUC(estimator,X,y):
         #AUC[j] = (W1-n1*(n1+1)/2)/(n1*n2)
     
     "Error to be maximized"
-    Final_error = np.mean(AUC)# - np.std(AUC)
+    Final_error = np.mean(AUC) - np.std(AUC)
     
     #"Calculate AUC"
     #PositiveOOB = PositiveOOBPosterior.mean(axis=1)
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     s0 = np.nanstd(Scores0)
     s1 = np.nanstd(Scores1)
     s = np.sqrt(((N0 - 1)*s0**2 + (N1 - 1)*s1**2)/(N - 2))
-    CohenD = (np.nanmean(Scores1) - np.nanmean(Scores0))/s;
+    CohenD = np.abs((np.nanmean(Scores1) - np.nanmean(Scores0))/s);
     # Biserial Size effect
     Biserial = np.sqrt(CohenD**2*N1*N0/(N*(N-2)+CohenD**2*N1*N0))#Diana Kornbrot 2014, eq.3
     size_effect = np.append(CohenD,Biserial)
