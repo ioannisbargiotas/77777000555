@@ -44,7 +44,7 @@ def OOBAUC(estimator,X,y):
         #AUC[j] = (W1-n1*(n1+1)/2)/(n1*n2)
     
     "Error to be maximized"
-    Final_error = np.mean(AUC) - np.std(AUC)
+    Final_error = np.median(AUC)# - np.std(AUC)
     
     #"Calculate AUC"
     #PositiveOOB = PositiveOOBPosterior.mean(axis=1)
