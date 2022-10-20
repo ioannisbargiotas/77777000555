@@ -200,18 +200,18 @@ if __name__ == "__main__":
     params = grid_rf.best_params_
     
     #Creation of Star Model
-    pvalue = np.zeros(11)*np.nan
-    Scores = np.zeros([maxMinLS,11])*np.nan
+    pvalue = np.zeros(BOiterations)*np.nan
+    Scores = np.zeros([maxMinLS,BOiterations])*np.nan
     Models = list()
-    for i in np.arange(0,11):
+    for i in np.arange(0,BOiterations):
         clf = RandomForestClassifier(n_estimators = Ntrees,**params,oob_score=True)
         clf.fit(X, Y)
         Scores[:,i] = clf.oob_decision_function_[:,-1]
         U = mww(Scores[Y==clf.classes_[0],i],Scores[Y==clf.classes_[1],i],alternative='less')
         pvalue[i] = U.pvalue
         Models.append(clf)
-    
-    index = np.arange(0,11)[pvalue==np.median(pvalue)]
+        
+    index = np.arange(0,BOiterations)[pvalue==np.median(pvalue)]
     pvalue = pvalue[index]
     Scores = Scores[:,index]
     Starclf = Models[int(index)]
