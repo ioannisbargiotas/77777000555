@@ -200,18 +200,33 @@ if __name__ == "__main__":
     params = grid_rf.best_params_
     
     #Creation of Star Model
-    Starclf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
+    pvalue = np.zeros(11)*np.nan
+    Scores = np.zeros([maxMinLS,11])*np.nan
+    Models = list()
+    for i in np.arange(0,11):
+        clf = RandomForestClassifier(n_estimators = Ntrees,**params,oob_score=True)
+        clf.fit(X, Y)
+        Scores[:,i] = clf.oob_decision_function_[:,-1]
+        U = mww(Scores[Y==clf.classes_[0],i],Scores[Y==clf.classes_[1],i],alternative='less')
+        pvalue[i] = U.pvalue
+        Models.append(clf)
+    
+    index = np.arange(0,11)[pvalue==np.median(pvalue)]
+    pvalue = pvalue[index]
+    Scores = Scores[:,index]
+    Starclf = Models[int(index)]
+    #Starclf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
     #Starclf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
-    Starclf.fit(X, Y)
+    #Starclf.fit(X, Y)
     
     #Take OOB probabilities of POSITIVE class 
-    Scores = Starclf.oob_decision_function_[:,-1]
+    #Scores = Starclf.oob_decision_function_[:,-1]
     #    
     #U statistics - alternative = less because we took scores of POSITIVE class 
-    U = mww(Scores[Y==Starclf.classes_[0]],Scores[Y==Starclf.classes_[1]],alternative='less')
+    #U = mww(Scores[Y==Starclf.classes_[0]],Scores[Y==Starclf.classes_[1]],alternative='less')
     #Result 1 - p value estimations
-    pvalue = U.pvalue
-    pvalue = np.append(pvalue,grid_rf.best_score_)
+    #pvalue = U.pvalue
+    #pvalue = np.append(pvalue,grid_rf.best_score_)
     #    
     #Result 2 - Predictor Importance
     final_importance = InterpretImportance1(X,Y,params,50,0)
