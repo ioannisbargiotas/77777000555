@@ -87,8 +87,8 @@ def InterpretImportance1(X,Y,params,iters,complexity):
     
     #Run multiple times and keep Importance
     importance = np.zeros([iters,X.shape[1]]) 
-    #clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
-    clf = RandomForestClassifier(n_estimators = Ntrees,**params,oob_score=True)
+    clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
+    #clf = RandomForestClassifier(n_estimators = Ntrees,**params,oob_score=True)
     #
     #Run InitImport in parallel
     importance = Parallel(n_jobs=-1)(delayed(InitImport)(clf,X,Y,i) for i in np.arange(0,iters))
@@ -124,7 +124,7 @@ def InterpretImportance1(X,Y,params,iters,complexity):
             clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
             #clf = RandomForestClassifier(n_estimators = Ntrees,max_features = Xtemp.shape[1],min_samples_leaf = params['min_samples_leaf'],oob_score=True)
         else:
-            clf = RandomForestClassifier(n_estimators = Ntrees,**params,oob_score=True)    
+            clf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)    
             #clf = RandomForestClassifier(n_estimators = Ntrees,max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],oob_score=True)    
         
         #For every meaningful combination, calculate AUC and importance
