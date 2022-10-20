@@ -213,6 +213,7 @@ if __name__ == "__main__":
         
     index = np.arange(0,BOiterations)[pvalue==np.median(pvalue)]
     pvalue = pvalue[index]
+    pvalue = np.append(pvalue,grid_rf.best_score_)
     Scores = Scores[:,index]
     Starclf = Models[int(index)]
     #Starclf = RandomForestClassifier(n_estimators = Ntrees,max_depth = params['max_depth'],max_features = params['max_features'],min_samples_leaf = params['min_samples_leaf'],min_samples_split = params['min_samples_split'],oob_score=True)
