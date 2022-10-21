@@ -250,7 +250,7 @@ if __name__ == "__main__":
             
             temp = clf.predict_proba(X0[Index,:])
             tempscore0[Index,i] = temp[:,-1]
-            temp = clf.predit_proba(X1[Index,:])
+            temp = clf.predict_proba(X1[Index,:])
             tempscore1[Index,i] = temp[:,-1]
             tempBeta[i,:] = clf.coef_
 
