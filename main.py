@@ -224,10 +224,10 @@ if __name__ == "__main__":
         for i in Instances:
             #select pair of dataset
             Inst_id0[i] 
-            XX0 = X0[i,:]
+            XX0 = X0[Inst_id0==Inst_id0[i],:]
             XX1 = X1[Inst_id1==Inst_id0[i],:]
 
-            XX = np.concatenate(([XX0.T], [XX1.T]),axis=0)
+            XX = np.concatenate((XX0, XX1),axis=0)
         
             Response0 = -1
             Response1 = 1
@@ -297,7 +297,7 @@ if __name__ == "__main__":
     elif kernel=='rbf':
         for i in Instances:
             Inst_id0[i] 
-            XX0 = X0[i,:]
+            XX0 = X0[Inst_id0==Inst_id0[i],:]
             XX1 = X1[Inst_id1==Inst_id0[i],:]
             #Generate normal datasets with centers given by each instance
             d = XX1-XX0
