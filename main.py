@@ -7,6 +7,7 @@ import openpyxl
 import numpy as np
 import sklearn as sk
 import pandas as pd
+from scipy.stats import wilcoxon as wilc
 import matplotlib.pyplot as plt
 from scipy.stats import rankdata
 from scipy.stats import mannwhitneyu as mww
