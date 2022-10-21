@@ -209,7 +209,7 @@ if __name__ == "__main__":
     N = X0.shape[0]    
     
     Instances = np.arange(0,N)
-    tempBeta = np.zeros((N,X0.shape[1]))
+    tempBeta = np.zeros((N,X0.shape[1]))*np.nan
     tempscore0 = np.zeros((N,N))*np.nan
     tempscore1 = np.zeros((N,N))*np.nan
     score0 = np.zeros((N,1))*np.nan
@@ -330,10 +330,24 @@ if __name__ == "__main__":
                 if r.importances_mean[ii] - 2 * r.importances_std[ii] > 0:
                     tempBeta[i,ii] = r.importances_mean[ii] 
 
+    if kernel=='linear':
+        result_size = Models.shape[1]
+        Walsh_Averages = np.zeros((int(N*(N-1)/2 + N), result_size))
+
+    k = 0
+    for i in np.arange(0,N):
+        for j in np.arange(i,N):
+            Walsh_Averages[k,:] = np.nanmean(Models[[i,j],:],axis = 0)
+            k = k+1;
+            
+    Pseudo_median_model = np.nanmedian(Walsh_Averages,axis=0)    # Predictors coefficients  and bias
+    
+    Scores0 = np.nansum(X0*Pseudo_median_model[0:-1],axis=1) + Pseudo_median_model[-1]
+    Scores1 = np.nansum(X1*Pseudo_median_model[0:-1],axis=1) + Pseudo_median_model[-1] 
     
     final_importance = np.nanmean(tempBeta,axis = 0)
-    Scores0 = np.nanmean(tempscore0,axis = 1)
-    Scores1 = np.nanmean(tempscore1,axis = 1)
+    #Scores0 = np.nanmean(tempscore0,axis = 1)
+    #Scores1 = np.nanmean(tempscore1,axis = 1)
     
     d = Scores1 - Scores0
     w, pvalue = wilc(d, alternative='greater')
