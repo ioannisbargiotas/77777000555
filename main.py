@@ -248,10 +248,10 @@ if __name__ == "__main__":
             Drop_values[i,Choices] = 1
             
             
-            temp = clf.decision_function(X0[Index,:])
-            tempscore0[Index,i] = temp
-            temp = clf.decision_function(X1[Index,:])
-            tempscore1[Index,i] = temp #temp[:,-1]
+            temp = clf.predict_proba(X0[Index,:])
+            tempscore0[Index,i] = temp[:,-1]
+            temp = clf.predit_proba(X1[Index,:])
+            tempscore1[Index,i] = temp[:,-1]
             tempBeta[i,:] = clf.coef_
 
             # model = []
