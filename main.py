@@ -218,6 +218,8 @@ if __name__ == "__main__":
     Drop_values = np.ones((N,N))*np.nan
     N_classifiers = int(np.round((Instances.shape[0]-1)/0.68))
     
+    kernel='linear'
+    
     if kernel=='linear':
         for i in Instances:
             #select pair of dataset
